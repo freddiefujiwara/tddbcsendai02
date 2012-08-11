@@ -13,13 +13,14 @@ class VendingMachine
   def input coin
     return coin unless [10,50,100,500,1000].include? coin 
     @total += coin
+    0
   end
   def refund!
-    total = @total
+    change = @total
     @total = 0
-    total
+    change
   end
-  def can_purchase?
+  def purchasable?
     @total >= @item_info[:price]
   end
 
@@ -39,8 +40,8 @@ describe VendingMachine ,"when initialized with object" do
     @vending_machine.total.should == 10
   end
   it "input 10 and 100 coin" do
-    @vending_machine.input 10
-    @vending_machine.input 100
+    @vending_machine.input(10).should == 0
+    @vending_machine.input(100).should == 0
     @vending_machine.total.should == 110
   end
   it "you can only 10,50,100,500,1000" do
@@ -52,8 +53,7 @@ describe VendingMachine ,"when initialized with object" do
   it "when you refund then total_output should be 0" do
     @vending_machine.input 10
     @vending_machine.input 50
-    total = @vending_machine.total
-    @vending_machine.refund!.should == total
+    @vending_machine.refund!.should == 60
     @vending_machine.total.should == 0
   end
   it "item info returns :name => coke , :price => 120 , :stock => 5" do
@@ -64,14 +64,14 @@ describe VendingMachine ,"when initialized with object" do
     }
   end
   it "if you input 10 then you can't buy" do
-    @vending_machine.input(10)
-    @vending_machine.can_purchase?.should == false
+    @vending_machine.input 10
+    @vending_machine.should_not be_purchasable
   end
   it "if you input 120 then you can buy" do
-    @vending_machine.input(10)
-    @vending_machine.input(10)
-    @vending_machine.input(100)
-    @vending_machine.can_purchase?.should == true
+    @vending_machine.input 10
+    @vending_machine.input 10
+    @vending_machine.input 100
+    @vending_machine.should be_purchasable
   end
 
 
